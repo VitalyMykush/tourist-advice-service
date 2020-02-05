@@ -1,12 +1,12 @@
-# tourist-advice-service
+п»ї# tourist-advice-service
 
 REST API
 
-Получить все города 
+РџРѕР»СѓС‡РёС‚СЊ РІСЃРµ РіРѕСЂРѕРґР° 
 GET     /cities
 
 
-Создать город 
+РЎРѕР·РґР°С‚СЊ РіРѕСЂРѕРґ 
 POST    /cities  
 {
   "id": 0,
@@ -18,11 +18,11 @@ POST    /cities
   ],
 }
 
-Получить город по ID
+РџРѕР»СѓС‡РёС‚СЊ РіРѕСЂРѕРґ РїРѕ ID
 GET     /cities/id
 
 
-Изменить город с ID
+РР·РјРµРЅРёС‚СЊ РіРѕСЂРѕРґ СЃ ID
 PUT     /cities/id
 {
   "advices": [
@@ -34,30 +34,30 @@ PUT     /cities/id
   "name": "string"
 }
 
-Удалить город с ID
+РЈРґР°Р»РёС‚СЊ РіРѕСЂРѕРґ СЃ ID
 DELETE  /cities/id 
 
 
-Изменить название города с ID
+РР·РјРµРЅРёС‚СЊ РЅР°Р·РІР°РЅРёРµ РіРѕСЂРѕРґР° СЃ ID
 PUT     /cities/id/edit/name
 {
   "name": "string"
 }
 
-Создать совет для города с ID
+РЎРѕР·РґР°С‚СЊ СЃРѕРІРµС‚ РґР»СЏ РіРѕСЂРѕРґР° СЃ ID
 POST    /cities/id/edit/advices
 {
   "advice": "string"
 }
 
 
-Изменить совет с INDEX города с ID
+РР·РјРµРЅРёС‚СЊ СЃРѕРІРµС‚ СЃ INDEX РіРѕСЂРѕРґР° СЃ ID
 PUT     /cities/id/edit/advices/index
 {
   "advice": "string"
 }
 
-Удалить совет с INDEX  для города с ID
+РЈРґР°Р»РёС‚СЊ СЃРѕРІРµС‚ СЃ INDEX  РґР»СЏ РіРѕСЂРѕРґР° СЃ ID
 DELETE  /cities/id/edit/advices/index
 
 
