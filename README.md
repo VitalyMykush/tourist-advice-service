@@ -2,28 +2,31 @@
 
 REST API
 
-Получить все города 
+Получить все города :
 GET     /cities
 
+Создать город :
+POST    /cities
 
-Создать город 
-POST    /cities  
 {
   "id": 0,
-  "name": "string"
+  "name": "string",
   "advices": [
     {
       "advice": "string"
     }
-  ],
+  ]
 }
 
-Получить город по ID
+
+Получить город по ID :
 GET     /cities/id
 
 
-Изменить город с ID
+
+Изменить город с ID :
 PUT     /cities/id
+
 {
   "advices": [
     {
@@ -34,30 +37,34 @@ PUT     /cities/id
   "name": "string"
 }
 
-Удалить город с ID
+
+Удалить город с ID :
 DELETE  /cities/id 
 
 
-Изменить название города с ID
+Изменить название города с ID :
 PUT     /cities/id/edit/name
+
 {
   "name": "string"
 }
 
-Создать совет для города с ID
+Создать совет для города с ID :
 POST    /cities/id/edit/advices
+
 {
   "advice": "string"
 }
 
 
-Изменить совет с INDEX города с ID
+Изменить совет с INDEX города с ID :
 PUT     /cities/id/edit/advices/index
+
 {
   "advice": "string"
 }
 
-Удалить совет с INDEX  для города с ID
+Удалить совет с INDEX  для города с ID :
 DELETE  /cities/id/edit/advices/index
 
 
