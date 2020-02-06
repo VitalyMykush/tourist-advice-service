@@ -28,13 +28,13 @@ public class City {
     @CollectionTable(name = "CITY_ADVICE")
     @OrderColumn
     @Column(name = "ADVICE")
-    private List<Advice> advices = new ArrayList<>();
+    private List<String> advices = new ArrayList<>();
 
     public City(String name) {
         this.name = name;
     }
 
-    public void addAdvice(Advice advice){
+    public void addAdvice(String advice){
         advices.add(advice);
     }
 }

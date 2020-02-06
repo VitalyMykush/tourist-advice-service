@@ -1,9 +1,7 @@
 package com.holiday.touristadviceservice.service;
 
 import com.google.common.collect.Lists;
-import com.holiday.touristadviceservice.entity.Advice;
 import com.holiday.touristadviceservice.entity.City;
-import com.holiday.touristadviceservice.entity.CityName;
 import com.holiday.touristadviceservice.entity.CityNotFoundException;
 import com.holiday.touristadviceservice.repository.CityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +50,7 @@ public class CityServiceImpl implements CityService {
     @Override
     public City update(City city, long id) throws CityNotFoundException {
         City found  = cityRepository.findById(id).orElseThrow(()-> new CityNotFoundException(id));
-        city.setId(id);
+        city.setId(found.getId());
         return cityRepository.save(city);
     }
 
@@ -79,13 +77,13 @@ public class CityServiceImpl implements CityService {
     @Override
     public City changeAdvice(long id, int index,String advice) throws IndexOutOfBoundsException, CityNotFoundException {
         City city = cityRepository.findById(id).orElseThrow(()-> new CityNotFoundException(id));
-        city.getAdvices().set(index, new Advice(advice));
+        city.getAdvices().set(index, advice);
         return cityRepository.save(city);
     }
     @Override
     public City addAdvice(long id, String advice) throws CityNotFoundException {
         City city = cityRepository.findById(id).orElseThrow(() -> new CityNotFoundException(id));
-        city.getAdvices().add(new Advice(advice));
+        city.getAdvices().add(advice);
         return cityRepository.save(city);
     }
 }

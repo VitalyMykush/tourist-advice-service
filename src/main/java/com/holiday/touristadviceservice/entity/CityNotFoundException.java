@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Getter @Setter
-@ResponseStatus(code = HttpStatus.NOT_FOUND, reason = "There is no such city")
 public class CityNotFoundException extends Exception {
     private String cityName;
     private long id;
