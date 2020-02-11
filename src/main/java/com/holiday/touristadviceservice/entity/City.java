@@ -22,6 +22,7 @@ public class City {
     private Long id;
 
     @Column(nullable = false)
+    @NotBlank
     private String name;
 
     @ElementCollection(fetch = FetchType.EAGER)

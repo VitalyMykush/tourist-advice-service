@@ -10,8 +10,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
@@ -26,38 +29,42 @@ public class CityController {
         this.cityService = cityService;
     }
 
-    @ExceptionHandler(CityNotFoundException.class)
+    @ExceptionHandler( CityNotFoundException.class)
     protected ResponseEntity<String> handleCityNotFoundException(CityNotFoundException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+        return ResponseEntity.notFound().build();
     }
+
     @ExceptionHandler(IndexOutOfBoundsException.class)
     protected ResponseEntity<String> handleIndexOutOfBoundsException(IndexOutOfBoundsException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        return ResponseEntity.notFound().build();
     }
 
     @GetMapping("/cities")
     public ResponseEntity<List<City>> getCities() throws CityNotFoundException {
-        return new ResponseEntity<>(cityService.readAll(), HttpStatus.OK);
+        return ResponseEntity.ok(cityService.readAll());
     }
 
     @PostMapping("/cities")
-    public ResponseEntity<City> createCity(@RequestBody @Valid City city, BindingResult result) {
+    public ResponseEntity<String> createCity(@RequestBody @Valid City city, BindingResult result, UriComponentsBuilder uriComponentsBuilder) {
         if(result.hasErrors())
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        return new ResponseEntity<>(cityService.create(city), HttpStatus.CREATED);
+            return ResponseEntity.badRequest().build();
+
+        Long id = cityService.create(city).getId();
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(id).toUri();
+        return ResponseEntity.created(location).build();
     }
 
     @PutMapping("/cities/{id}")
     public ResponseEntity<City> updateCity(@PathVariable("id") Long id, @RequestBody @Valid City city, BindingResult result) throws CityNotFoundException {
         if(result.hasErrors()) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().build();
         }
-        return new ResponseEntity<>(cityService.update(city, id), HttpStatus.OK);
+        return ResponseEntity.ok(cityService.update(city,id));
     }
 
     @GetMapping("/cities/{id}")
     public ResponseEntity<City> getCity(@PathVariable("id") Long id) throws CityNotFoundException {
-           return new ResponseEntity<>(cityService.read(id), HttpStatus.OK);
+        return ResponseEntity.ok(cityService.read(id));
     }
 
     @DeleteMapping("/cities/{id}")
@@ -70,31 +77,34 @@ public class CityController {
     public ResponseEntity<City> renameCity(@PathVariable("id") Long id, @RequestBody Map<String, String> update) throws CityNotFoundException {
         String cityName = update.get("name");
         if(cityName.isEmpty() && cityName == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().build();
         }
-        return new ResponseEntity<>(cityService.rename(id, cityName), HttpStatus.OK);
+        return ResponseEntity.ok(cityService.rename(id, cityName));
     }
 
     @PutMapping(value = "/cities/{id}/edit/advices/{index}")
     public ResponseEntity<City> changeAdvice(@PathVariable("id") Long id, @PathVariable("index") int index, @RequestBody Map<String, String> update) throws CityNotFoundException,IndexOutOfBoundsException {
         String advice = update.get("advice");
         if(advice.isEmpty() && advice == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().build();
         }
-        return new ResponseEntity<>(cityService.changeAdvice(id, index, advice), HttpStatus.OK);
+        return ResponseEntity.ok(cityService.changeAdvice(id, index, advice));
     }
 
     @DeleteMapping(value = "/cities/{id}/edit/advices/{index}")
-    public ResponseEntity<City> deleteAdvice(@PathVariable("id") Long id, @PathVariable("index") int index) throws IndexOutOfBoundsException, CityNotFoundException {
-            return new ResponseEntity<>(cityService.deleteAdvice(id, index), HttpStatus.NO_CONTENT);
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteAdvice(@PathVariable("id") Long id, @PathVariable("index") int index) throws IndexOutOfBoundsException, CityNotFoundException {
+            cityService.deleteAdvice(id, index);
     }
 
     @PostMapping("/cities/{id}/edit/advices")
     public ResponseEntity<City> addAdvice(@PathVariable("id") Long id, @RequestBody Map<String, String> update) throws CityNotFoundException {
         String advice = update.get("advice");
         if(advice.isEmpty() && advice == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().build();
         }
-        return new ResponseEntity<>(cityService.addAdvice(id, advice), HttpStatus.CREATED);
+        int index = cityService.addAdvice(id,advice).getAdvices().indexOf(advice);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{index}").buildAndExpand(index).toUri();
+        return ResponseEntity.created(location).build();
     }
 }
