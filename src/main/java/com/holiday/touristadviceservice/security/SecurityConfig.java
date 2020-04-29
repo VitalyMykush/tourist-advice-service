@@ -23,7 +23,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String CITIES_ENDPOINT = "/cities";
     private static final String H2_ENDPOINT = "/h2/**";
     private static final String AUTH_ENDPOINT = "/auth/**";
-    private static final String USERINFO_ENDPOINT = "/me";
+    private static final String USER_INFO_ENDPOINT = "/me";
+    private static final String HOME_ENDPOINT = "/home";
+
 
 
     @Autowired
@@ -40,8 +42,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
         http.csrf().disable().authorizeRequests()
-                .antMatchers(CITIES_ENDPOINT, USERINFO_ENDPOINT).authenticated()
-                .antMatchers(AUTH_ENDPOINT, H2_ENDPOINT).permitAll()
+                .antMatchers(CITIES_ENDPOINT, USER_INFO_ENDPOINT).authenticated()
+                .antMatchers(AUTH_ENDPOINT, H2_ENDPOINT,HOME_ENDPOINT).permitAll()
                 .anyRequest().authenticated()
                 .and().exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
                 .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);

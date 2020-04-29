@@ -11,10 +11,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-public class UserinfoController {
+public class UserInfoController {
 
     @GetMapping("/me")
-    public ResponseEntity getUserinfo(@AuthenticationPrincipal Principal principal) {
+    public ResponseEntity getUserInfo(@AuthenticationPrincipal Principal principal) {
         Map<Object, Object> model = new HashMap<>();
         model.put("username", principal.getName());
         return ResponseEntity.ok(model);
