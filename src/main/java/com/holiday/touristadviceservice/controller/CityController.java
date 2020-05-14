@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping(produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
+@RequestMapping(path = "/cities",produces = { MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 public class CityController {
 
     private final CityService cityService;
@@ -39,12 +39,12 @@ public class CityController {
         return ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/cities")
+    @GetMapping
     public ResponseEntity<List<City>> getCities() throws CityNotFoundException {
         return ResponseEntity.ok(cityService.readAll());
     }
 
-    @PostMapping("/cities")
+    @PostMapping
     public ResponseEntity<String> createCity(@RequestBody @Valid City city, BindingResult result, UriComponentsBuilder uriComponentsBuilder) {
         if(result.hasErrors())
             return ResponseEntity.badRequest().build();
@@ -54,7 +54,7 @@ public class CityController {
         return ResponseEntity.created(location).build();
     }
 
-    @PutMapping("/cities/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<City> updateCity(@PathVariable("id") Long id, @RequestBody @Valid City city, BindingResult result) throws CityNotFoundException {
         if(result.hasErrors()) {
             return ResponseEntity.badRequest().build();
@@ -62,18 +62,18 @@ public class CityController {
         return ResponseEntity.ok(cityService.update(city,id));
     }
 
-    @GetMapping("/cities/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<City> getCity(@PathVariable("id") Long id) throws CityNotFoundException {
         return ResponseEntity.ok(cityService.read(id));
     }
 
-    @DeleteMapping("/cities/{id}")
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCity(@PathVariable("id") Long id) {
         cityService.delete(id);
     }
 
-    @PutMapping("/cities/{id}/edit/name")
+    @PutMapping("/{id}/edit/name")
     public ResponseEntity<City> renameCity(@PathVariable("id") Long id, @RequestBody Map<String, String> update) throws CityNotFoundException {
         String cityName = update.get("name");
         if(cityName.isEmpty() && cityName == null) {
@@ -82,7 +82,7 @@ public class CityController {
         return ResponseEntity.ok(cityService.rename(id, cityName));
     }
 
-    @PutMapping(value = "/cities/{id}/edit/advices/{index}")
+    @PutMapping(value = "/{id}/edit/advices/{index}")
     public ResponseEntity<City> changeAdvice(@PathVariable("id") Long id, @PathVariable("index") int index, @RequestBody Map<String, String> update) throws CityNotFoundException,IndexOutOfBoundsException {
         String advice = update.get("advice");
         if(advice.isEmpty() && advice == null) {
@@ -91,13 +91,13 @@ public class CityController {
         return ResponseEntity.ok(cityService.changeAdvice(id, index, advice));
     }
 
-    @DeleteMapping(value = "/cities/{id}/edit/advices/{index}")
+    @DeleteMapping(value = "/{id}/edit/advices/{index}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteAdvice(@PathVariable("id") Long id, @PathVariable("index") int index) throws IndexOutOfBoundsException, CityNotFoundException {
             cityService.deleteAdvice(id, index);
     }
 
-    @PostMapping("/cities/{id}/edit/advices")
+    @PostMapping("/{id}/edit/advices")
     public ResponseEntity<City> addAdvice(@PathVariable("id") Long id, @RequestBody Map<String, String> update) throws CityNotFoundException {
         String advice = update.get("advice");
         if(advice.isEmpty() && advice == null) {

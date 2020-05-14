@@ -20,11 +20,12 @@ public class AppUser {
     @Column(name = "USERNAME", length = 36, nullable = false)
     private String username;
 
+    //Encrypted password
     @Column(name = "PASSWORD", nullable = false)
-    private String encrytedPassword;
+    private String password;
 
-    public AppUser(String username, String encrytedPassword) {
+    public AppUser(String username, String password) {
         this.username = username;
-        this.encrytedPassword = encrytedPassword;
+        this.password = password;
     }
 }

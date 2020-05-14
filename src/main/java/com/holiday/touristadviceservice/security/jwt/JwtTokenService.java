@@ -2,22 +2,18 @@ package com.holiday.touristadviceservice.security.jwt;
 
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
-import java.util.List;
 
 @Component
 public class JwtTokenService implements JwtService {
 
     @Value("${jwt.secret.key}")
     public String SECRET_KEY;
-    private long JWT_TOKEN_VALIDITY = 3600000; // 1h
+    private long JWT_TOKEN_VALIDITY = 3_600_000; // 1h
     private SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS512;
 
     @PostConstruct

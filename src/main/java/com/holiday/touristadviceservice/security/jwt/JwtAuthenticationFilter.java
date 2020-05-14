@@ -1,56 +1,51 @@
 package com.holiday.touristadviceservice.security.jwt;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.holiday.touristadviceservice.entity.AppUser;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 
-@Component
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-    private JwtService jwtTokenService;
+    private JwtService jwtService;
 
-    @Autowired
-    public JwtAuthenticationFilter(JwtService jwtTokenService) {
-        this.jwtTokenService = jwtTokenService;
+    public JwtAuthenticationFilter(JwtService jwtService, AuthenticationManager authenticationManager) {
+        this.jwtService = jwtService;
+        super.setAuthenticationManager(authenticationManager);
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
-        String header = httpServletRequest.getHeader("Authorization");
-
-        if (header == null || !header.startsWith("Bearer ")) {
-            filterChain.doFilter(httpServletRequest, httpServletResponse);
-            return;
+    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
+        if (!request.getMethod().equals("POST")) {
+            throw new AuthenticationServiceException("Authentication method not supported: " + request.getMethod());
+        } else {
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                AppUser user = objectMapper.readValue(request.getInputStream(), AppUser.class);
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword(), Collections.emptyList());
+                return this.getAuthenticationManager().authenticate(authentication);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
-        UsernamePasswordAuthenticationToken authenticationToken = convert(header);
-        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-        filterChain.doFilter(httpServletRequest, httpServletResponse);
     }
 
-
-    private UsernamePasswordAuthenticationToken convert(String header) {
-        String token = header.substring(7);
-
-        if (token != null && jwtTokenService.validateToken(token)) {
-            String username = jwtTokenService.getUsername(token);
-            if (username != null) {
-                return new UsernamePasswordAuthenticationToken(username, null, new ArrayList<>());
-            } else {
-                return null;
-            }
-        } else {
-            return null;
-        }
+    @Override
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
+        String token = jwtService.generateJwtToken(((User) authResult.getPrincipal()).getUsername());
+        response.addHeader(JwtConstants.HEADER_AUTHENTICATION, JwtConstants.TOKEN_PREFIX + token);
     }
 }
