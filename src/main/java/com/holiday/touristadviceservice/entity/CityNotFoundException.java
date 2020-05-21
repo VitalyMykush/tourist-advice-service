@@ -2,8 +2,6 @@ package com.holiday.touristadviceservice.entity;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Getter @Setter
 public class CityNotFoundException extends Exception {
@@ -14,7 +12,7 @@ public class CityNotFoundException extends Exception {
         this.cityName = cityName;
     }
     public CityNotFoundException(long id){
-        super("City with id: " + id + "  not found");
+        super("City with ID: " + id + "  not found");
         this.id = id;
     }
     public CityNotFoundException(){

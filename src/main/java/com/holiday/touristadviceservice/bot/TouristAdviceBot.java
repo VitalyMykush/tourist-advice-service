@@ -3,35 +3,43 @@ package com.holiday.touristadviceservice.bot;
 import com.holiday.touristadviceservice.entity.City;
 import com.holiday.touristadviceservice.entity.CityNotFoundException;
 import com.holiday.touristadviceservice.service.CityService;
-import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
-@Component
+
 public class TouristAdviceBot extends TelegramLongPollingBot {
 
-    public static final String TOKEN = "1001031741:AAFE_0no7KD8muGxAxdqh_MYySpW1OQf644";
-    private static final String ADVICE_NOT_FOUND = "К сожалению я не могу вам ничего посоветовать(";
+    private static final String ADVICE_NOT_FOUND_MESSAGE = "К сожалению я не могу вам ничего посоветовать. Для данного города нет советов.";
+    private static final String MANY_CITY_WITH_NAME_MESSAGE = "В мире много городов с таким названием";
+    private static final String CITY_NOT_FOUND_MESSAGE = "К сожалению город не найден";
 
+    private String TOKEN;
+    private String botUsername = "TouristAdviceBot";
     private CityService cityService;
 
-    @Autowired
-    public TouristAdviceBot(CityService cityService){
+    public TouristAdviceBot(CityService cityService, String token) {
+        if (cityService == null) {
+            throw new IllegalArgumentException("CityService cannot be null");
+        }
+        if (token == null || token.isEmpty()) {
+            throw new IllegalArgumentException("Telegram token cannot be null or empty");
+        }
         this.cityService = cityService;
+        this.TOKEN = token;
     }
 
-    @SneakyThrows
+    public TouristAdviceBot(CityService cityService, String token, String botUsername) {
+        this(cityService, token);
+        if (botUsername == null || botUsername.isEmpty()) {
+            throw new IllegalArgumentException("botUsername cannot be null or empty");
+        }
+        this.botUsername = botUsername;
+    }
+
     @Override
     public void onUpdateReceived(Update update) {
         try {
@@ -40,10 +48,10 @@ public class TouristAdviceBot extends TelegramLongPollingBot {
                 String cityName = inMessage.getText();
                 SendMessage outMessage = new SendMessage();
                 outMessage.setChatId(inMessage.getChatId());
-                try{
+                try {
                     execute(outMessage.setText(getResponse(cityService.read(cityName))));
-                }catch (CityNotFoundException cityNotFoundException){
-                    execute(outMessage.setText(cityNotFoundException.getMessage()));
+                } catch (CityNotFoundException cityNotFoundException) {
+                    execute(outMessage.setText(CITY_NOT_FOUND_MESSAGE));
                 }
             }
         } catch (TelegramApiException e) {
@@ -53,12 +61,12 @@ public class TouristAdviceBot extends TelegramLongPollingBot {
 
     private String getResponse(List<City> cities) {
         if (cities.size() == 1) {
-            return cities.get(0).getAdvices().stream().reduce((s1,s2) -> s1.concat(s2)).orElse(ADVICE_NOT_FOUND);
+            return cities.get(0).getAdvices().stream().reduce(String::concat).orElse(ADVICE_NOT_FOUND_MESSAGE);
         } else {
-            StringBuilder response = new StringBuilder("В мире много городов с таким названием\n");
+            StringBuilder response = new StringBuilder(MANY_CITY_WITH_NAME_MESSAGE).append("\n");
             for (City c : cities) {
                 response.append(c.getName()).append(" (").append(c.getId()).append(")\n");
-                response.append(c.getAdvices().stream().reduce((s1, s2) -> s1.concat("\n").concat(s2)).orElse(ADVICE_NOT_FOUND));
+                response.append(c.getAdvices().stream().reduce((s1, s2) -> s1.concat("\n").concat(s2)).orElse(ADVICE_NOT_FOUND_MESSAGE));
                 response.append("\n\n");
             }
             return response.toString();
@@ -67,7 +75,7 @@ public class TouristAdviceBot extends TelegramLongPollingBot {
 
     @Override
     public String getBotUsername() {
-        return "TouristAdviceBot";
+        return botUsername;
     }
 
     @Override

@@ -1,58 +1,45 @@
 package com.holiday.touristadviceservice.security.jwt;
 
 import io.jsonwebtoken.*;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.Base64;
 import java.util.Date;
 
-@Component
 public class JwtTokenService implements JwtService {
 
-    @Value("${jwt.secret.key}")
-    public String SECRET_KEY;
-    private long JWT_TOKEN_VALIDITY = 3_600_000; // 1h
+    private final String secretKey;
     private SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS512;
 
-    @PostConstruct
-    public void init() {
-        SECRET_KEY = Base64.getEncoder().encodeToString(SECRET_KEY.getBytes());
+    public JwtTokenService(final String secretKey) {
+        assert secretKey != null;
+        this.secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
     @Override
     public String generateJwtToken(String username) {
         long nowMillis = System.currentTimeMillis();
         Date now = new Date(nowMillis);
-        Date validity = new Date(nowMillis + JWT_TOKEN_VALIDITY);
+        Date validity = new Date(nowMillis + JwtConstants.JWT_TOKEN_VALIDITY);
         return Jwts.builder()
                 .setIssuedAt(now)
                 .setExpiration(validity)
                 .setSubject(username)
-                .signWith(signatureAlgorithm, SECRET_KEY)
+                .signWith(signatureAlgorithm, secretKey)
                 .compact();
     }
 
     @Override
-    public String getUsername(String token){
+    public String getUsername(String token) {
 
         return Jwts.parser()
-                .setSigningKey(SECRET_KEY)
+                .setSigningKey(secretKey)
                 .parseClaimsJws(token).getBody().getSubject();
     }
 
     @Override
     public boolean validateToken(String token) {
-        try {
-            Jws<Claims> claims = Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token);
-            if (claims.getBody().getExpiration().before(new Date())) {
-                return false;
-            }
-            return true;
-        } catch (JwtException | IllegalArgumentException e) {
-            throw new JwtAuthenticationException("Expired or invalid JWT token");
-        }
+        Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+        return claims.getBody().getExpiration().before(new Date());
     }
 }
 
