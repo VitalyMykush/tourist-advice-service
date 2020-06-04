@@ -67,7 +67,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.apply(jwtSecurityConfig); // add jwt security configuration
 
-        http.oauth2Login().authorizationEndpoint().baseUri("/login/oauth2/authorization")
+        http.oauth2Login().authorizationEndpoint().baseUri(OAUTH_AUTHORIZATION_ENDPOINT)
                 .and()
                 .defaultSuccessUrl(USER_INFO_ENDPOINT, true);
         http.logout().logoutSuccessUrl("/users/logout").permitAll();
