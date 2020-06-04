@@ -22,7 +22,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String USER_INFO_ENDPOINT = "/users/info";
 
     private static final String SIGN_UP_ENDPOINT = "/users/sign-up";
-    private static final String LOGOUT_INFO_ENDPOINT = "/users/logout";
+    private static final String USERS_LOGOUT_ENDPOINT = "/users/logout";
     private static final String LOGIN_ENDPOINT = "/login**";
     private static final String OAUTH_AUTHORIZATION_ENDPOINT = "/login/oauth2/authorization/*";
 
@@ -45,7 +45,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable().authorizeRequests()
                 .antMatchers(CITIES_ENDPOINT, USER_INFO_ENDPOINT).authenticated()
-                .antMatchers(H2_ENDPOINT, LOGOUT_INFO_ENDPOINT, SIGN_UP_ENDPOINT, LOGIN_ENDPOINT, OAUTH_AUTHORIZATION_ENDPOINT).permitAll()
+                .antMatchers(H2_ENDPOINT, USERS_LOGOUT_ENDPOINT, SIGN_UP_ENDPOINT, LOGIN_ENDPOINT, OAUTH_AUTHORIZATION_ENDPOINT).permitAll()
                 .antMatchers(SWAGGER_UI, SWAGGER_WEBJARS, SWAGGER_API_DOCS, SWAGGER_CONFIGURATION, SWAGGER_CONFIGURATION_UI, SWAGGER_RESOURCES).permitAll()
                 .anyRequest().authenticated();
         // with oauth2ClientAuthenticationProcessingFilter
@@ -70,7 +70,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.oauth2Login().authorizationEndpoint().baseUri(OAUTH_AUTHORIZATION_ENDPOINT)
                 .and()
                 .defaultSuccessUrl(USER_INFO_ENDPOINT, true);
-        http.logout().logoutSuccessUrl("/users/logout").permitAll();
+        http.logout().logoutSuccessUrl(USERS_LOGOUT_ENDPOINT).permitAll();
     }
 
 
