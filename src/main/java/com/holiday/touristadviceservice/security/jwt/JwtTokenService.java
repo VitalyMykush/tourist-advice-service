@@ -19,7 +19,7 @@ public class JwtTokenService implements JwtService {
     public String generateJwtToken(String username) {
         long nowMillis = System.currentTimeMillis();
         Date now = new Date(nowMillis);
-        Date validity = new Date(nowMillis + JwtConstants.JWT_TOKEN_VALIDITY);
+        Date validity = new Date(nowMillis + JwtConstants.TOKEN_VALIDITY);
         return Jwts.builder()
                 .setIssuedAt(now)
                 .setExpiration(validity)
