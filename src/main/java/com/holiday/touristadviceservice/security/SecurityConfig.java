@@ -20,12 +20,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final String CITIES_ENDPOINT = "/cities";
     private static final String USER_INFO_ENDPOINT = "/users/info";
+
     private static final String SIGN_UP_ENDPOINT = "/users/sign-up";
     private static final String USERS_LOGOUT_ENDPOINT = "/users/logout";
     private static final String LOGIN_ENDPOINT = "/login**";
     private static final String OAUTH_AUTHORIZATION_ENDPOINT = "/login/oauth2/authorization/*";
 
     private static final String H2_ENDPOINT = "/h2/**";
+
     private static final String SWAGGER_API_DOCS = "/v2/api-docs";
     private static final String SWAGGER_UI = "/swagger-ui.html";
     private static final String SWAGGER_WEBJARS = "/webjars/**";
